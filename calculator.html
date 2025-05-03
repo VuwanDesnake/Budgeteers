@@ -9,33 +9,125 @@
 <body>
     <div class="container">
         <header>
-            <button class="back-button" onclick="window.location.href='Home.html'">&lt;</button>
+            <button class="back-button">&lt;</button>
             <h1>Income</h1>
+            <div class="date" id="current-date">Apr 25, 2025</div>
         </header>
+
         <main>
-            <div class="large-box"></div>
-            <label class="income-label">Source of Income</label>
-            <div class="small-box"></div>
+            <div class="large-box" id="display">0</div>
+
+            <!-- Source of Income Input -->
+            <label class="income-label" for="source">Source of Income</label>
+            <input type="text" id="source" class="small-box" placeholder="Enter source">
+
+            <!-- Date Input -->
+            <label class="date-label" for="manual-date">Enter Date</label>
+            <input type="date" id="manual-date" class="date-input">
         </main>
+
         <section class="calculator">
             <div class="grid">
-                <button class="key">1</button>
-                <button class="key">2</button>
-                <button class="key">3</button>
-                <button class="key">+</button>
-                <button class="key">4</button>
-                <button class="key">5</button>
-                <button class="key">6</button>
-                <button class="key">-</button>
-                <button class="key">7</button>
-                <button class="key">8</button>
-                <button class="key">9</button>
-                <button id="equal">=</button>
-                <button class="key">0</button>
-                <button class="key">/</button>
-                <button class="key">*</button>
+                <button type="button" class="key">1</button>
+                <button type="button" class="key">2</button>
+                <button type="button" class="key">3</button>
+                <button type="button" class="key">+</button>
+                <button type="button" class="key">4</button>
+                <button type="button" class="key">5</button>
+                <button type="button" class="key">6</button>
+                <button type="button" class="key">-</button>
+                <button type="button" class="key">7</button>
+                <button type="button" class="key">8</button>
+                <button type="button" class="key">9</button>
+                <button id="equal" type="button"><b>Enter</b></button>
+                <button type="button" class="key">0</button>
+                <button type="button" class="key">/</button>
+                <button type="button" class="key">*</button>
             </div>
         </section>
     </div>
+
+    <script>
+        const keys = document.querySelectorAll('.key');
+        const equalBtn = document.getElementById('equal');
+        const display = document.getElementById('display');
+        const sourceInput = document.getElementById('source');
+        const dateInput = document.getElementById('manual-date');
+        let input = "";
+
+        // Update display value on the screen
+        function updateDisplay(value) {
+            display.textContent = value;
+        }
+
+        // Add click listeners to all number/operator buttons
+        keys.forEach(key => {
+            key.addEventListener('click', () => {
+                input += key.textContent;
+                updateDisplay(input);
+            });
+        });
+
+        // Handle "=" button (Submit income)
+        equalBtn.addEventListener('click', async () => {
+            const amount = parseFloat(input);
+            const source = sourceInput.value.trim();
+            const date = dateInput.value;
+
+            // Validation: Check if the amount is a number and greater than zero
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid income amount greater than zero.");
+                return;
+            }
+
+            // Validation: Check if the source and date fields are not empty
+            if (source === "") {
+                alert("Please enter the source of income.");
+                return;
+            }
+
+            if (date === "") {
+                alert("Please select a date.");
+                return;
+            }
+
+            // Send data to PHP via fetch
+            try {
+                const response = await fetch('save_income.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `amount=${encodeURIComponent(amount)}&source=${encodeURIComponent(source)}&income_date=${encodeURIComponent(date)}`
+                });
+
+                const result = await response.text();
+                alert(result);
+
+                // Reset after success
+                input = "";
+                updateDisplay(0);
+                sourceInput.value = "";
+                dateInput.value = "";
+            } catch (error) {
+                alert("Error saving income.");
+            }
+        });
+
+        // Set today's date in the top-right corner
+        document.addEventListener("DOMContentLoaded", () => {
+            const dateDiv = document.getElementById("current-date");
+            const today = new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            dateDiv.textContent = today.toLocaleDateString('en-US', options);
+        });
+
+        // Handle manual date input
+        dateInput.addEventListener('change', () => {
+            const selectedDate = new Date(dateInput.value);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById("current-date").textContent = selectedDate.toLocaleDateString('en-US', options);
+        });
+    </script>
 </body>
 </html>
