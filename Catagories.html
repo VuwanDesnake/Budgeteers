@@ -1,69 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Categories</title>
-    <link rel="stylesheet" href="Catagories.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=430, initial-scale=1.0">
+  <title>Expense Categories</title>
+  <link rel="stylesheet" href="Catagories.css">
+
+  <script>
+    window.onload = function() {
+      const form = document.querySelector('form');
+      const amountInputs = document.querySelectorAll('input[type="text"]');
+      const dateInput = document.getElementById('manual-date');
+
+      // Attach number validation to amount fields
+      amountInputs.forEach(input => {
+        input.addEventListener('input', function(event) {
+          const value = event.target.value;
+          if (value !== "" && isNaN(value)) {
+            input.setCustomValidity("Please enter a valid number for the amount.");
+            input.reportValidity();
+          } else {
+            input.setCustomValidity("");
+          }
+        });
+      });
+
+      // Form submit validation
+      form.addEventListener('submit', function(event) {
+        let atLeastOneFilled = false;
+
+        amountInputs.forEach(input => {
+          if (input.value.trim() !== "") {
+            atLeastOneFilled = true;
+          }
+        });
+
+        if (!atLeastOneFilled) {
+          alert("Please fill at least one expense amount before submitting.");
+          event.preventDefault();
+          return;
+        }
+
+        if (dateInput.value.trim() === "") {
+          alert("Please select a date.");
+          event.preventDefault();
+          return;
+        }
+      });
+    };
+  </script>
 </head>
+
 <body>
-    <div class="container">
-        <button class="back-button" onclick="window.location.href='Home.html'">
-            <img src="icons/Back.png" alt="Back" style="width:24px; height:24px;">
-          </button>
-        <div class="header">Expense Categories</div>
+  <div class="container">
+    <button class="back-button">←</button>
+    <div class="header">Expense Categories</div>
 
-        <div class="category">
-            <img src="icons/Shopping.png" alt="Shopping">
-            <div class="category-text">
-                <span>Shopping</span>
-                <input type="text">
-            </div>
-        </div>
+    <!-- Start of Form -->
+    <form action="../save_data.php" method="POST">
 
-        <div class="category">
-            <img src="icons/Bills.png" alt="Bill">
-            <div class="category-text">
-                <span>Bill</span>
-                <input type="text">
-            </div>
-        </div>
+      <div class="category">
+        <img src="Shopping.png" alt="Shopping">
+        <input type="text" name="shopping" placeholder="Shopping Amount">
+      </div>
 
-        <div class="category">
-            <img src="icons/Food.png" alt="Foods">
-            <div class="category-text">
-                <span>Foods</span>
-                <input type="text">
-            </div>
-        </div>
+      <div class="category">
+        <img src="Bills.png" alt="Bill">
+        <input type="text" name="bills" placeholder="Bill Amount">
+      </div>
 
-        <div class="category">
-            <img src="icons/Groceries.png" alt="Groceries">
-            <div class="category-text">
-                <span>Groceries</span>
-                <input type="text">
-            </div>
-        </div>
+      <div class="category">
+        <img src="Food.png" alt="Foods">
+        <input type="text" name="food" placeholder="Foods Amount">
+      </div>
 
-        <div class="category">
-            <img src="icons/Transportation.png" alt="Transportation">
-            <div class="category-text">
-                <span>Transportation</span>
-                <input type="text">
-            </div>
-        </div>
+      <div class="category">
+        <img src="Investment.png" alt="Investment">
+        <input type="text" name="investment" placeholder="Investment Amount">
+      </div>
 
-        <div class="category">
-            <img src="icons/Others.png" alt="Others">
-            <div class="category-text">
-                <span>Others</span>
-                <input type="text">
-            </div>
-        </div>
+      <div class="category">
+        <img src="Transportation.png" alt="Transportation">
+        <input type="text" name="transportation" placeholder="Transportation Amount">
+      </div>
 
-        <textarea class="remarks" placeholder="Remarks"></textarea>
+      <div class="category">
+        <img src="Others.png" alt="Others">
+        <input type="text" name="others" placeholder="Others Amount">
+      </div>
 
-        <button class="enter-button">Enter</button>
-    </div>
+      <label for="manual-date" class="date-label">Select Date</label>
+      <input type="date" id="manual-date" name="date" class="date-input">
+
+      <textarea class="remarks" name="remarks" placeholder="Add any remarks..."></textarea>
+
+      <button type="submit" class="enter-button">Enter</button>
+
+    </form>
+    <!-- End of Form -->
+
+  </div>
 </body>
 </html>
